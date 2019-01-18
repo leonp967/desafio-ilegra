@@ -1,3 +1,3 @@
-Desafio de programação Backend Ilegra
+Desafio técnico Backend Ilegra
 
 Desenvolvido em Java 8
