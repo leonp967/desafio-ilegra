@@ -1,3 +1,3 @@
-Desafio técnico Backend Ilegra
+## Desafio técnico Backend Ilegra
 
-Desenvolvido em Java 8
+Desenvolvido em Java 8 com Spring, Hystrix e CompletableFuture.
