@@ -1,8 +1,8 @@
-package entitys;
+package com.leonp967.sweexpress.desafioJava.model;
 
 import java.util.List;
 
-public class Sale {
+public class Sale implements FileDataModel {
     private int id;
     private String salesmanName;
     private List<SaleItem> itemsList;

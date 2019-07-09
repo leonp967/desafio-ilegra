@@ -1,8 +1,6 @@
-package entitys;
+package com.leonp967.sweexpress.desafioJava.model;
 
-import java.util.List;
-
-public class Customer {
+public class Customer implements FileDataModel{
     private long cnpj;
     private String name;
     private String businessArea;
@@ -11,12 +9,6 @@ public class Customer {
         this.cnpj = cnpj;
         this.name = name;
         this.businessArea = businessArea;
-    }
-
-    public Customer(List<String> attributes) throws NumberFormatException{
-        cnpj = Long.parseLong(attributes.get(0));
-        name = attributes.get(1);
-        businessArea = attributes.get(2);
     }
 
     public long getCnpj() {

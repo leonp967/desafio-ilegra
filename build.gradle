@@ -1,0 +1,42 @@
+plugins {
+    id 'java'
+}
+
+group 'com.leonp967.sweexpress'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    springVersion = '5.1.8.RELEASE'
+    junitVersion = '5.5.0'
+    commonsVersion = '2.6'
+    guavaVersion = '28.0-jre'
+    hystrixVersion = '1.5.18'
+    log4jVersion = '2.12.0'
+    slf4jVersion = '2.0.0-alpha0'
+    mockitoVersion = '2.28.2'
+}
+
+dependencies {
+    compile group: 'org.springframework', name: 'spring-context', version: springVersion
+    compile group: 'org.springframework', name: 'spring-core', version: springVersion
+    compile group: 'org.springframework', name: 'spring-beans', version: springVersion
+    
+    compile group: 'commons-io', name: 'commons-io', version: commonsVersion
+    
+    compile group: 'com.google.guava', name: 'guava', version: guavaVersion
+    
+    compile group: 'com.netflix.hystrix', name: 'hystrix-core', version: hystrixVersion
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: slf4jVersion
+
+    testCompile group: 'org.mockito', name: 'mockito-core', version: mockitoVersion
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitVersion
+    testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitVersion
+}

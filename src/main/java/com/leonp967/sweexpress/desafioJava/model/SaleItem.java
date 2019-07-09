@@ -1,6 +1,6 @@
-package entitys;
+package com.leonp967.sweexpress.desafioJava.model;
 
-public class SaleItem {
+public class SaleItem implements FileDataModel{
     private int id;
     private int quantity;
     private double price;
@@ -9,12 +9,6 @@ public class SaleItem {
         this.id = id;
         this.quantity = quantity;
         this.price = price;
-    }
-
-    public SaleItem(String[] attributes) throws NumberFormatException{
-        id = Integer.parseInt(attributes[0]);
-        quantity = Integer.parseInt(attributes[1]);
-        price = Double.parseDouble(attributes[2]);
     }
 
     public int getId() {
