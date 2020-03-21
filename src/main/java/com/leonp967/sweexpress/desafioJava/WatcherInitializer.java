@@ -4,35 +4,37 @@ import com.leonp967.sweexpress.desafioJava.config.AppConfig;
 import com.leonp967.sweexpress.desafioJava.processor.FileProcessor;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.WatchEvent;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.function.Function;
 
 import static java.nio.file.StandardWatchEventKinds.OVERFLOW;
 
 public class WatcherInitializer {
-    private WatchService fileWatcher;
-    private Path inDirectoryPath;
-    private ExecutorService executor;
-    private ApplicationContext applicationContext;
+
     private final Integer THREAD_POOL_THRESHOLD;
 
     @Autowired
-    public WatcherInitializer(WatchService fileWatcher, Path inDirectoryPath, ExecutorService executor, ApplicationContext applicationContext, Integer threadPoolThreshold){
-        this.fileWatcher = fileWatcher;
-        this.inDirectoryPath = inDirectoryPath;
-        this.executor = executor;
-        this.applicationContext = applicationContext;
+    private Path inDirectoryPath;
+    @Autowired
+    private WatchService fileWatcher;
+    @Autowired
+    private ExecutorService executor;
+    @Autowired
+    private Function<File, FileProcessor> fileProcessorFactory;
+
+    public WatcherInitializer(Integer threadPoolThreshold){
         THREAD_POOL_THRESHOLD = threadPoolThreshold;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
         WatcherInitializer watcherInitializer = applicationContext.getBean(WatcherInitializer.class);
         watcherInitializer.watchFiles();
@@ -75,7 +77,7 @@ public class WatcherInitializer {
                     ((ThreadPoolExecutor)executor).setMaximumPoolSize(poolSize);
                     ((ThreadPoolExecutor)executor).setCorePoolSize(poolSize);
                 }
-                executor.execute((FileProcessor)applicationContext.getBean("fileProcessor", fileName.toFile()));
+                executor.execute(fileProcessorFactory.apply(fileName.toFile()));
                 break;
             }
 

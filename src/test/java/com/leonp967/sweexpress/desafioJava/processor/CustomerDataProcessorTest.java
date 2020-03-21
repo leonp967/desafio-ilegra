@@ -2,7 +2,6 @@ package com.leonp967.sweexpress.desafioJava.processor;
 
 import com.leonp967.sweexpress.desafioJava.model.Customer;
 import com.leonp967.sweexpress.desafioJava.model.FileDataModel;
-import com.leonp967.sweexpress.desafioJava.processor.CustomerDataProcessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.context.ApplicationContext;
@@ -24,7 +23,7 @@ public class CustomerDataProcessorTest {
         ApplicationContext applicationContext = mock(ApplicationContext.class);
         when(applicationContext.getBean(eq("customer"), (Object[])any()))
                 .thenAnswer(invocation -> new Customer(invocation.getArgument(1), invocation.getArgument(2), invocation.getArgument(3)));
-        processor = new CustomerDataProcessor(applicationContext);
+        processor = new CustomerDataProcessor();
     }
 
     @Test

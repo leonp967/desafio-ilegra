@@ -1,8 +1,8 @@
 package com.leonp967.sweexpress.desafioJava.processor;
 
 import com.leonp967.sweexpress.desafioJava.model.FileDataModel;
+import com.leonp967.sweexpress.desafioJava.model.Sale;
 import com.leonp967.sweexpress.desafioJava.model.SaleItem;
-import org.springframework.context.ApplicationContext;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,12 +10,10 @@ import java.util.stream.Collectors;
 
 public class SalesDataProcessor implements DataProcessor {
 
-    private ApplicationContext applicationContext;
-    private final String ITEM_ATTRIBUTES_DELIMITER;
-    private final String ITEM_DELIMITER;
+    private String ITEM_ATTRIBUTES_DELIMITER;
+    private String ITEM_DELIMITER;
 
-    public SalesDataProcessor(ApplicationContext applicationContext, String itemAttributesDelimiter, String itemDelimiter){
-        this.applicationContext = applicationContext;
+    public SalesDataProcessor(String itemAttributesDelimiter, String itemDelimiter){
         ITEM_ATTRIBUTES_DELIMITER = itemAttributesDelimiter;
         ITEM_DELIMITER = itemDelimiter;
     }
@@ -34,9 +32,17 @@ public class SalesDataProcessor implements DataProcessor {
                     int itemId = Integer.parseInt(itemAttributes[0]);
                     int quantity = Integer.parseInt(itemAttributes[1]);
                     double price = Double.parseDouble(itemAttributes[2]);
-                    return (SaleItem) applicationContext.getBean("saleItem", itemId, quantity, price);
+                    return SaleItem.builder()
+                            .id(itemId)
+                            .quantity(quantity)
+                            .price(price)
+                            .build();
                 }).collect(Collectors.toList());
 
-        return (FileDataModel) applicationContext.getBean("sale", id, salesmanName, saleItemList);
+        return Sale.builder()
+                .id(id)
+                .itemsList(saleItemList)
+                .salesmanName(salesmanName)
+                .build();
     }
 }
