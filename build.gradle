@@ -15,7 +15,6 @@ ext {
     springVersion = '5.2.4.RELEASE'
     junitVersion = '5.5.0'
     commonsVersion = '2.6'
-    guavaVersion = '28.0-jre'
     hystrixVersion = '1.5.18'
     log4jVersion = '2.12.0'
     slf4jVersion = '2.0.0-alpha0'
@@ -29,9 +28,7 @@ dependencies {
     compile group: 'org.springframework', name: 'spring-beans', version: springVersion
     
     compile group: 'commons-io', name: 'commons-io', version: commonsVersion
-    
-    compile group: 'com.google.guava', name: 'guava', version: guavaVersion
-    
+
     compile group: 'com.netflix.hystrix', name: 'hystrix-core', version: hystrixVersion
 
     compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4jVersion
