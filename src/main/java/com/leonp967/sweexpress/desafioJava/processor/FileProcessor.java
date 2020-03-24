@@ -3,6 +3,8 @@ package com.leonp967.sweexpress.desafioJava.processor;
 import com.leonp967.sweexpress.desafioJava.bo.DataProcessingBO;
 import com.leonp967.sweexpress.desafioJava.command.DataProcessingCommand;
 import com.leonp967.sweexpress.desafioJava.command.ResultsProcessingCommand;
+import com.leonp967.sweexpress.desafioJava.file.FileReader;
+import com.leonp967.sweexpress.desafioJava.file.FileWriter;
 import com.leonp967.sweexpress.desafioJava.model.Customer;
 import com.leonp967.sweexpress.desafioJava.model.FileDataModel;
 import com.leonp967.sweexpress.desafioJava.model.Sale;
@@ -16,6 +18,8 @@ import rx.Observable;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -37,6 +41,10 @@ public class FileProcessor implements Runnable {
     private Function<List<String>, DataProcessingCommand> dataCommandFactory;
     @Autowired
     private Function<DataProcessingBO, ResultsProcessingCommand> resultsCommandFactory;
+    @Autowired
+    private FileReader fileReader;
+    @Autowired
+    private FileWriter fileWriter;
 
     public FileProcessor(String filePath, String outDirectory, String attributeDelimiter){
         fileToProcess = new File(filePath);
@@ -55,6 +63,7 @@ public class FileProcessor implements Runnable {
     }
 
     private void generateResults(String fileName) {
+        LOGGER.info("Generating results for file {}", fileName);
         DataProcessingBO dataProcessingBO = DataProcessingBO.builder()
                 .customers(customers)
                 .sales(sales)
@@ -70,43 +79,30 @@ public class FileProcessor implements Runnable {
     private void writeReportToFile(String fileName, int amountClients, int amountSalesman, int idBiggestSale, String worstSalesman){
         String outputString = String.format("Amount of Clients: %d\nAmount of Salesmen: %d\nID of most expensive sale: %d\nWorst Salesman ever: %s",
                 amountClients, amountSalesman, idBiggestSale, worstSalesman);
-        File outputDirectory = new File(OUT_DIRECTORY);
 
-        if(!outputDirectory.exists())
-            outputDirectory.mkdirs();
-
-        File fileOutput = new File(OUT_DIRECTORY + fileName + ".done.dat");
-        try {
-            fileOutput.createNewFile();
-            Files.write(fileOutput.toPath(), outputString.getBytes());
-        } catch (IOException e) {
-            LOGGER.error("Error writing report of file {}", fileName, e);
-            e.printStackTrace();
-        }
+        Path path = Paths.get(OUT_DIRECTORY, fileName + ".done.dat");
+        fileWriter.writeResults(path, outputString).subscribe();
     }
 
     private boolean processFile() {
         try {
-            while(!fileToProcess.renameTo(fileToProcess)) {
-                Thread.sleep(10);
-            }
+            fileReader.readFileLines(fileToProcess.toPath()).subscribe(lines -> {
+                List<Observable<FileDataModel>> commandObservables = lines.stream().map(line -> {
+                    List<String> attributes = Arrays.asList(line.split(ATTRIBUTE_DELIMITER));
+                    DataProcessingCommand dataProcessingCommand = dataCommandFactory.apply(attributes);
+                    return dataProcessingCommand.observe();
+                }).collect(Collectors.toList());
 
-            Stream<String> lines = Files.lines(fileToProcess.toPath());
-            List<Observable<FileDataModel>> commandObservables = lines.map(line -> {
-                List<String> attributes = Arrays.asList(line.split(ATTRIBUTE_DELIMITER));
-                DataProcessingCommand dataProcessingCommand = dataCommandFactory.apply(attributes);
-                return dataProcessingCommand.observe();
-            }).collect(Collectors.toList());
-
-            Observable.zip(commandObservables, Arrays::asList)
-                    .subscribe(models -> models.forEach(dataModel -> {
-                        if(dataModel instanceof Salesman)
-                            salesmen.add((Salesman) dataModel);
-                        else if(dataModel instanceof Customer)
-                            customers.add((Customer) dataModel);
-                        else if(dataModel instanceof Sale)
-                            sales.add((Sale) dataModel);
-                    }));
+                Observable.zip(commandObservables, Arrays::asList)
+                        .subscribe(models -> models.forEach(dataModel -> {
+                            if(dataModel instanceof Salesman)
+                                salesmen.add((Salesman) dataModel);
+                            else if(dataModel instanceof Customer)
+                                customers.add((Customer) dataModel);
+                            else if(dataModel instanceof Sale)
+                                sales.add((Sale) dataModel);
+                        }));
+            });
         } catch (Exception e) {
             LOGGER.error("Error processing file {}", fileToProcess.toPath(), e);
             e.printStackTrace();

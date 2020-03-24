@@ -5,6 +5,8 @@ import com.leonp967.sweexpress.desafioJava.bo.DataProcessingBO;
 import com.leonp967.sweexpress.desafioJava.command.DataProcessingCommand;
 import com.leonp967.sweexpress.desafioJava.command.ResultsProcessingCommand;
 import com.leonp967.sweexpress.desafioJava.factory.ProcessorFactory;
+import com.leonp967.sweexpress.desafioJava.file.FileReader;
+import com.leonp967.sweexpress.desafioJava.file.FileWriter;
 import com.leonp967.sweexpress.desafioJava.processor.FileProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -114,5 +116,15 @@ public class AppConfig {
     public FileProcessor fileProcessor(File fileName) {
         String filePath = IN_DIRECTORY_PATH + fileName;
         return new FileProcessor(filePath, OUT_DIRECTORY_PATH, ATTRIBUTE_DELIMITER);
+    }
+
+    @Bean
+    public FileReader fileReader() {
+        return new FileReader();
+    }
+
+    @Bean
+    public FileWriter fileWriter() {
+        return new FileWriter();
     }
 }
